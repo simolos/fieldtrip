@@ -1162,6 +1162,25 @@ switch eventformat
       end
     end
 
+    % Handling MSG triggers -S- 
+    if ~isempty(asc.msg)
+      timestamp = str2double(asc.msg(:,2));
+      value     = asc.msg(:,3);
+      sample    = (timestamp-hdr.FirstTimeStamp)/hdr.TimeStampPerSample + 1;
+      
+      % note that in this dataformat the first input trigger can be before
+      % the start of the data acquisition
+      for i=1:length(timestamp)
+        event(end+1).type       = 'MSG';
+        event(end  ).sample     = sample(i);
+        event(end  ).timestamp  = timestamp(i);
+        event(end  ).value      = value(i);
+        event(end  ).duration   = 1;
+        event(end  ).offset     = 0;
+      end
+    end
+
+
     % these fields are dealt with a bit differently, the 'e' -events
     % contain more information than the 's' -events
     fnames = {'eblink', 'efix', 'esacc'};
